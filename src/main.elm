@@ -21,7 +21,7 @@ main =
 
 -- MODEL
 boardSize: Int
-boardSize = 50
+boardSize = 200
 
 type alias Model =
     Board
@@ -100,23 +100,28 @@ processCell board y x cell =
 
 countNeighbours: Board -> Int -> Int -> Int
 countNeighbours board row column =
-    let
-        neighbours = 
-            [ getCell board (row - 1) (column - 1)
-            , getCell board (row - 1) column
-            , getCell board (row - 1) (column + 1)
-            , getCell board row (column - 1)
-            , getCell board row (column + 1)
-            , getCell board (row + 1) (column - 1)
-            , getCell board (row + 1) column
-            , getCell board (row + 1) (column + 1)
-            ]
-    in
-        List.length (List.filter (\c -> c == On) neighbours)
+    getNeighbours board row column
+        |> List.filter (\c -> c == On)
+        |> List.length
+
+getNeighbours: Board -> Int -> Int -> List Cell
+getNeighbours board row column =
+    [ getCell board (row - 1) (column - 1)
+    , getCell board (row - 1) column
+    , getCell board (row - 1) (column + 1)
+    , getCell board row (column - 1)
+    , getCell board row (column + 1)
+    , getCell board (row + 1) (column - 1)
+    , getCell board (row + 1) column
+    , getCell board (row + 1) (column + 1)
+    ]
 
 getCell: Board -> Int -> Int -> Cell
 getCell board row column =
-    Maybe.withDefault Off (Array.get column (Maybe.withDefault Array.empty (Array.get row board)))
+    Array.get row board
+        |> Maybe.withDefault Array.empty
+        |> Array.get column
+        |> Maybe.withDefault Off
 
 -- SUBSCRIPTIONS
 
