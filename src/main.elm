@@ -3,8 +3,9 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 import Browser
 import Html exposing (Html, button, div, span, text)
 import Html.Events exposing (onClick)
-import Random
+import Random exposing (Generator)
 import Time
+import Array exposing (Array)
 
 
 main =
@@ -34,10 +35,15 @@ type Cell
     | Off
 
 
+initialBoardGenerator: Generator (List (List Cell))
+initialBoardGenerator =
+    Random.list boardSize (Random.list boardSize (Random.uniform On [ Off ]))
+
+
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( []
-    , Random.generate NewBoard (Random.list boardSize (Random.list boardSize (Random.uniform On [ Off ])))
+    , Random.generate NewBoard initialBoardGenerator
     )
 
 
