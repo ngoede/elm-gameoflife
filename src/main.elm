@@ -27,7 +27,7 @@ type alias Model =
 
 
 type alias Board =
-    Array (List Cell)
+    Array (Array Cell)
 
 
 type Cell
@@ -35,9 +35,9 @@ type Cell
     | Off
 
 
-initialBoardGenerator: Generator (Array (List Cell))
+initialBoardGenerator: Generator (Array (Array Cell))
 initialBoardGenerator =
-    randomArray boardSize (Random.list boardSize (Random.uniform On [ Off ]))
+    randomArray boardSize (randomArray boardSize (Random.uniform On [ Off ]))
 
 randomArray: Int -> Generator a -> Generator (Array a)
 randomArray size generator =
@@ -76,7 +76,7 @@ update msg model =
 
 nextBoard : Board -> Board
 nextBoard =
-    Array.map (\r -> List.map flipCell r)
+    Array.map (\r -> Array.map flipCell r)
 
 
 flipCell : Cell -> Cell
@@ -107,9 +107,9 @@ view model =
     div [] (Array.toList (Array.map renderRow model))
 
 
-renderRow : List Cell -> Html Msg
+renderRow : Array Cell -> Html Msg
 renderRow row =
-    div [] (List.map renderCell row)
+    div [] (Array.toList (Array.map renderCell row))
 
 
 renderCell : Cell -> Html Msg
