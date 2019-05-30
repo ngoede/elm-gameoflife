@@ -6,6 +6,7 @@ import Html.Events exposing (onClick)
 import Random exposing (Generator)
 import Time
 import Array exposing (Array)
+import Maybe
 
 
 main =
@@ -75,32 +76,54 @@ update msg model =
 
 
 nextBoard : Board -> Board
-nextBoard =
-    Array.indexedMap mapRow
+nextBoard board =
+    Array.indexedMap (processRow board) board
 
 
-mapRow : Int -> Array Cell -> Array Cell
-mapRow y =
-    Array.map flipCell
+processRow : Board -> Int -> Array Cell -> Array Cell
+processRow board y =
+    Array.indexedMap (processCell board y)
 
 
-flipCell : Cell -> Cell
-flipCell cell =
+processCell: Board -> Int -> Int -> Cell -> Cell
+processCell board y x cell =
     case cell of
         On ->
-            Off
-
+            case (countNeighbours board y x) of
+                2 -> On
+                3 -> On
+                _ -> Off
         Off ->
-            On
+            case (countNeighbours board y x) of
+                3 -> On
+                _ -> Off
 
+countNeighbours: Board -> Int -> Int -> Int
+countNeighbours board row column =
+    let
+        neighbours = 
+            [ getCell board (row - 1) (column - 1)
+            , getCell board (row - 1) column
+            , getCell board (row - 1) (column + 1)
+            , getCell board row (column - 1)
+            , getCell board row (column + 1)
+            , getCell board (row + 1) (column - 1)
+            , getCell board (row + 1) column
+            , getCell board (row + 1) (column + 1)
+            ]
+    in
+        List.length (List.filter (\c -> c == On) neighbours)
 
+getCell: Board -> Int -> Int -> Cell
+getCell board row column =
+    Maybe.withDefault Off (Array.get column (Maybe.withDefault Array.empty (Array.get row board)))
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every 1000 Tick
+    Time.every 250 Tick
 
 
 
