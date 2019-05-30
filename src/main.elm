@@ -3,6 +3,7 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 import Browser
 import Html exposing (Html, button, div, span, text)
 import Html.Events exposing (onClick)
+import Random
 import Time
 
 
@@ -17,7 +18,8 @@ main =
 
 
 -- MODEL
-
+boardSize: Int
+boardSize = 50
 
 type alias Model =
     Board
@@ -34,11 +36,8 @@ type Cell
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( [ [ On, Off, On ]
-      , [ Off, On, On ]
-      , [ Off, Off, Off ]
-      ]
-    , Cmd.none
+    ( []
+    , Random.generate NewBoard (Random.list boardSize (Random.list boardSize (Random.uniform On [ Off ])))
     )
 
 
@@ -48,6 +47,7 @@ init _ =
 
 type Msg
     = Tick Time.Posix
+    | NewBoard Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -55,6 +55,10 @@ update msg model =
     case msg of
         Tick _ ->
             ( nextBoard model, Cmd.none )
+
+        NewBoard board ->
+            ( board, Cmd.none )
+
 
 
 -- GAME
@@ -73,6 +77,7 @@ flipCell cell =
 
         Off ->
             On
+
 
 
 -- SUBSCRIPTIONS
