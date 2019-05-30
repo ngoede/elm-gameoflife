@@ -3,10 +3,16 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 import Browser
 import Html exposing (Html, button, div, span, text)
 import Html.Events exposing (onClick)
+import Time
 
 
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 
@@ -14,6 +20,10 @@ main =
 
 
 type alias Model =
+    Board
+
+
+type alias Board =
     List (List Cell)
 
 
@@ -22,12 +32,14 @@ type Cell
     | Off
 
 
-init : Model
-init =
-    [ [ On, Off, On ]
-    , [ Off, On, On ]
-    , [ Off, Off, Off ]
-    ]
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( [ [ On, Off, On ]
+      , [ Off, On, On ]
+      , [ Off, Off, Off ]
+      ]
+    , Cmd.none
+    )
 
 
 
@@ -35,13 +47,23 @@ init =
 
 
 type Msg
-    = Increment
-    | Decrement
+    = Tick Time.Posix
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    model
+    case msg of
+        Tick _ ->
+            ( nextBoard model, Cmd.none )
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Time.every 1000 Tick
 
 
 
@@ -66,3 +88,22 @@ renderCell cell =
 
         Off ->
             span [] [ text "□" ]
+
+
+
+-- GAME
+
+
+nextBoard : Board -> Board
+nextBoard =
+    List.map (\r -> List.map flipCell r)
+
+
+flipCell : Cell -> Cell
+flipCell cell =
+    case cell of
+        On ->
+            Off
+
+        Off ->
+            On
