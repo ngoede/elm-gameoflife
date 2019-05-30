@@ -92,25 +92,13 @@ processRow board y =
 
 processCell : Board -> Int -> Int -> Cell -> Cell
 processCell board y x cell =
-    case cell of
-        On ->
-            case countNeighbours board y x of
-                2 ->
-                    On
-
-                3 ->
-                    On
-
-                _ ->
-                    Off
-
-        Off ->
-            case countNeighbours board y x of
-                3 ->
-                    On
-
-                _ ->
-                    Off
+    case (cell, countNeighbours board y x) of
+        (On, 2) ->
+            On
+        (_, 3) ->
+            On
+        _ ->
+            Off
 
 
 countNeighbours : Board -> Int -> Int -> Int
@@ -156,7 +144,14 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [] (Array.toList (Array.map renderRow model))
+    div [] (renderBoard model)
+
+
+renderBoard : Board -> List (Html Msg)
+renderBoard board =
+    board
+        |> Array.map renderRow
+        |> Array.toList
 
 
 renderRow : Array Cell -> Html Msg
