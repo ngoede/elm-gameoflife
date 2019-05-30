@@ -1,12 +1,12 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
+import Array exposing (Array)
 import Browser
 import Html exposing (Html, button, div, span, text)
 import Html.Events exposing (onClick)
+import Maybe
 import Random exposing (Generator)
 import Time
-import Array exposing (Array)
-import Maybe
 
 
 main =
@@ -20,8 +20,12 @@ main =
 
 
 -- MODEL
-boardSize: Int
-boardSize = 200
+
+
+boardSize : Int
+boardSize =
+    200
+
 
 type alias Model =
     Board
@@ -36,11 +40,12 @@ type Cell
     | Off
 
 
-initialBoardGenerator: Generator (Array (Array Cell))
+initialBoardGenerator : Generator (Array (Array Cell))
 initialBoardGenerator =
     randomArray boardSize (randomArray boardSize (Random.uniform On [ Off ]))
 
-randomArray: Int -> Generator a -> Generator (Array a)
+
+randomArray : Int -> Generator a -> Generator (Array a)
 randomArray size generator =
     Random.map Array.fromList (Random.list size generator)
 
@@ -85,26 +90,37 @@ processRow board y =
     Array.indexedMap (processCell board y)
 
 
-processCell: Board -> Int -> Int -> Cell -> Cell
+processCell : Board -> Int -> Int -> Cell -> Cell
 processCell board y x cell =
     case cell of
         On ->
-            case (countNeighbours board y x) of
-                2 -> On
-                3 -> On
-                _ -> Off
-        Off ->
-            case (countNeighbours board y x) of
-                3 -> On
-                _ -> Off
+            case countNeighbours board y x of
+                2 ->
+                    On
 
-countNeighbours: Board -> Int -> Int -> Int
+                3 ->
+                    On
+
+                _ ->
+                    Off
+
+        Off ->
+            case countNeighbours board y x of
+                3 ->
+                    On
+
+                _ ->
+                    Off
+
+
+countNeighbours : Board -> Int -> Int -> Int
 countNeighbours board row column =
     getNeighbours board row column
         |> List.filter (\c -> c == On)
         |> List.length
 
-getNeighbours: Board -> Int -> Int -> List Cell
+
+getNeighbours : Board -> Int -> Int -> List Cell
 getNeighbours board row column =
     [ getCell board (row - 1) (column - 1)
     , getCell board (row - 1) column
@@ -116,12 +132,15 @@ getNeighbours board row column =
     , getCell board (row + 1) (column + 1)
     ]
 
-getCell: Board -> Int -> Int -> Cell
+
+getCell : Board -> Int -> Int -> Cell
 getCell board row column =
     Array.get row board
         |> Maybe.withDefault Array.empty
         |> Array.get column
         |> Maybe.withDefault Off
+
+
 
 -- SUBSCRIPTIONS
 
