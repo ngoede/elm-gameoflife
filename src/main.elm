@@ -26,6 +26,7 @@ init : Model
 init =
     [ [ On, Off, On ]
     , [ Off, On, On ]
+    , [ Off, Off, Off ]
     ]
 
 
