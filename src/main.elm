@@ -76,7 +76,12 @@ update msg model =
 
 nextBoard : Board -> Board
 nextBoard =
-    Array.map (\r -> Array.map flipCell r)
+    Array.indexedMap mapRow
+
+
+mapRow : Int -> Array Cell -> Array Cell
+mapRow y =
+    Array.map flipCell
 
 
 flipCell : Cell -> Cell
