@@ -57,6 +57,23 @@ update msg model =
             ( nextBoard model, Cmd.none )
 
 
+-- GAME
+
+
+nextBoard : Board -> Board
+nextBoard =
+    List.map (\r -> List.map flipCell r)
+
+
+flipCell : Cell -> Cell
+flipCell cell =
+    case cell of
+        On ->
+            Off
+
+        Off ->
+            On
+
 
 -- SUBSCRIPTIONS
 
@@ -88,22 +105,3 @@ renderCell cell =
 
         Off ->
             span [] [ text "□" ]
-
-
-
--- GAME
-
-
-nextBoard : Board -> Board
-nextBoard =
-    List.map (\r -> List.map flipCell r)
-
-
-flipCell : Cell -> Cell
-flipCell cell =
-    case cell of
-        On ->
-            Off
-
-        Off ->
-            On
