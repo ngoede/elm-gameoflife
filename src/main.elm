@@ -27,7 +27,7 @@ type alias Model =
 
 
 type alias Board =
-    List (List Cell)
+    Array (List Cell)
 
 
 type Cell
@@ -35,14 +35,18 @@ type Cell
     | Off
 
 
-initialBoardGenerator: Generator (List (List Cell))
+initialBoardGenerator: Generator (Array (List Cell))
 initialBoardGenerator =
-    Random.list boardSize (Random.list boardSize (Random.uniform On [ Off ]))
+    randomArray boardSize (Random.list boardSize (Random.uniform On [ Off ]))
+
+randomArray: Int -> Generator a -> Generator (Array a)
+randomArray size generator =
+    Random.map Array.fromList (Random.list size generator)
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( []
+    ( Array.fromList []
     , Random.generate NewBoard initialBoardGenerator
     )
 
@@ -72,7 +76,7 @@ update msg model =
 
 nextBoard : Board -> Board
 nextBoard =
-    List.map (\r -> List.map flipCell r)
+    Array.map (\r -> List.map flipCell r)
 
 
 flipCell : Cell -> Cell
@@ -100,7 +104,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [] (List.map renderRow model)
+    div [] (Array.toList (Array.map renderRow model))
 
 
 renderRow : List Cell -> Html Msg
